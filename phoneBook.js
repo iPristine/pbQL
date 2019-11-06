@@ -1,54 +1,59 @@
 'use strict';
 
-const Contact = require('./contact.js');
+const Contact = require('./contact.js').Contact;
 
 class PhoneBook {
     constructor() {
         this.contacts = new Map();
     }
 
-    validateName(name) {
-        if (/(^[^;.]+$)/.test(name)) {
-            throw new SyntaxError('Invalid name');
-        }
-    }
-
     createContact(name) {
-        this.validateName(name);
-
         if (!this.contacts.has(name)) {
             this.contacts.set(name, new Contact(name));
         }
     }
 
     deleteContact(name) {
-        this.validateName(name);
         if (this.contacts.has(name)) {
             this.contacts.delete(name);
         }
     }
 
-    addPhone(name, phone) {
+    addPhonesAndEmails(name, phones, emails) {
+        phones.forEach(phone => this._addPhone(name, phone));
+        emails.forEach(email => this._addEmail(name, email));
+    }
+
+    delPhonesAndEmails(name, phones, emails) {
+        phones.forEach(phone => this._deletePhone(name, phone));
+        emails.forEach(email => this._deleteEmail(name, email));
+    }
+
+    _addPhone(name, phone) {
         if (this.contacts.has(name)) {
-            this.contacts.get(name).addPhone(phone);
+            this.contacts.get(name)
+                .addPhone(phone);
         }
     }
 
-    addEmail(name, email) {
+    _addEmail(name, email) {
         if (this.contacts.has(name)) {
-            this.contacts.get(name).addEmail(email);
+            this.contacts.get(name)
+                .addEmail(email);
         }
     }
 
-    deletePhone(name, phone) {
+    _deletePhone(name, phone) {
         if (this.contacts.has(name)) {
-            this.contacts.get(name).deletePhone(phone);
+            this.contacts.get(name)
+                .deletePhone(phone);
         }
     }
 
-    deleteEmail(name, email) {
+    _deleteEmail(name, email) {
         if (this.contacts.has(name)) {
-            this.contacts.get(name).deleteEmail(email);
+            this.contacts.get(name)
+                .deleteEmail(email);
         }
     }
 
@@ -64,7 +69,9 @@ class PhoneBook {
         }
 
         return filteredContacts.reduce((res, contact) => {
-            return res.push(contact.getContact(fieldTypes));
+            res.push(contact.getContact(fieldTypes));
+
+            return res;
         }, []);
     }
 
@@ -77,6 +84,10 @@ class PhoneBook {
                 this.contacts.delete(contact.getName());
             }
         }
+    }
+
+    clear() {
+        this.contacts.clear();
     }
 }
 
